@@ -1,0 +1,170 @@
+<div class="signature-pad-container">
+    <a class="button-text" id="clear_button">CLEAR</a>
+    <canvas id="signature_pad"></canvas>
+</div>
+
+<button class="button button-primary" id="finish_button">Finish</button>
+<script src="https://cdn.jsdelivr.net/npm/signature_pad@2.3.2/dist/signature_pad.min.js" integrity="sha256-W+ivNvVjmQX6FTlF0S+SCDMjAuTVNKzH16+kQvRWcTg=" crossorigin="anonymous"></script>
+<style>
+
+html, body {
+    background-color: gainsboro;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    
+    padding: 0em;
+}
+
+.button {
+    display: block;
+    width: 20em;
+    height: 2.5em;
+    border-radius: 7px;
+    padding: 0.75em;
+    /* margin-bottom: 1em; */
+
+    line-height: 1em;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    
+    font-size: 1rem;
+    font-weight: bold;
+    font-family: 'Nunito', sans-serif;
+}
+
+.button:hover {
+    text-decoration: none;
+}
+
+.button:focus,
+.button.focus {
+    outline: none;
+}
+
+.button-primary, header {
+    color: white !important;
+}
+
+.button-primary:hover {
+    opacity: 0.5;
+}
+
+.button-primary:active,
+.button-primary.active
+{
+    box-shadow: 0 6px 6px 0 #E7E9EB; 
+}
+
+.button-primary:focus,
+.button-primary.focus
+{
+    color: white !important;
+}
+
+
+html, body {
+    width: 100%;
+    height: 100%;
+    
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #ecf0f1;
+}
+
+header {
+    width: 100%;
+    height: 4em;
+    margin-bottom: 4em;
+    text-align: center;
+    padding-top: 1em;
+}
+
+canvas {
+    width: 100%;
+    height: 96%; 
+    
+    border: 1px #1E8FC5 dashed;
+    border-radius: 7px;
+}
+
+.signature-pad-container {
+    width: 600em;
+    max-width: 92%;
+    height: 400em;
+    max-height: 80%;
+    padding: 1em; 
+    
+    position: relative;
+    
+    background-color: white;
+    border:  none;
+    text-align: right;
+}
+
+#clear_button {
+    z-index: 10;
+    position: absolute;
+    right: 2em;
+    padding: .5em .5em;
+    
+    color: #1E8FC5;
+    font-weight: 600;
+    font-size: 14pt;
+    cursor: pointer;
+}
+
+#finish_button {
+    margin-top: 1.5em;
+    margin-bottom: .5em; 
+    cursor: pointer;
+    width: 180pt;
+    background-color: #1E8FC5;
+    border-width: 0;
+    box-shadow: none;
+}
+</style>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+    var canvas = document.querySelector("#signature_pad");
+    var signaturePad = new SignaturePad(canvas, {
+        minWidth: 2,
+        maxWidth: 4,
+    });
+
+    function resizeCanvas() {
+        var ratio =  Math.max(window.devicePixelRatio || 1, 1);
+        canvas.width = canvas.offsetWidth * ratio;
+        canvas.height = canvas.offsetHeight * ratio;
+        canvas.getContext("2d").scale(ratio, ratio);
+        let storedData = signaturePad.toData();
+        signaturePad.clear(); // otherwise isEmpty() might return incorrect value
+        signaturePad.fromData(storedData);
+    }
+
+    window.addEventListener("resize", resizeCanvas);
+    resizeCanvas();
+    
+    var clearButton = document.querySelector("#clear_button");
+    clearButton.addEventListener("click", function() {
+        signaturePad.clear();
+        // signaturePad.toDataURL();
+    });
+    
+    var finishButton = document.querySelector("#finish_button");
+    finishButton.addEventListener("click", function() {
+        //const svgDataUrl = signaturePad.toDataURL("image/svg+xml");
+        //console.log(svgDataUrl);
+        var param = signaturePad.toDataURL();
+        FileMaker.PerformScriptWithOption(
+            "854_SaveSignature_DontEditOrRemove", param, "5"
+            ); 
+    });
+});
+</script>
